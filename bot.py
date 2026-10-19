@@ -14,8 +14,6 @@ from functions import (
     get_injury_report,
     resolve_team_slug,
     get_latest_github_release,
-    get_last_announced_tag,
-    set_last_announced_tag,
     format_release_announcement,
 )
 
@@ -42,7 +40,7 @@ def main():
     bot = init_bot()
 
     async def _check_and_announce_release():
-        """Post to #updates if a new GitHub release has been published since the last announcement."""
+        """Post to #updates if a new GitHub release hasn't been announced there yet."""
         if not GITHUB_REPO:
             return
         try:
@@ -55,8 +53,6 @@ def main():
             return
 
         tag = release["tag_name"]
-        if tag == get_last_announced_tag():
-            return
 
         guild = bot.guilds[0] if bot.guilds else None
         if not guild:
@@ -66,9 +62,13 @@ def main():
             logger.warning(f"Channel '{UPDATES_CHANNEL_NAME}' not found — skipping release announcement")
             return
 
+        # Use channel history as the idempotency store — survives container restarts.
+        async for message in channel.history(limit=50):
+            if message.author == bot.user and tag in message.content:
+                return
+
         try:
             await channel.send(format_release_announcement(release))
-            set_last_announced_tag(tag)
             logger.info(f"Announced release {tag}")
         except Exception as e:
             logger.error(f"Failed to send release announcement for {tag}: {e}")
