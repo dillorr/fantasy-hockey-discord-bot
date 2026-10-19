@@ -15,7 +15,7 @@ def init_bot() -> commands.Bot:
 
     # Create bot instance with slash command support
     bot = commands.Bot(
-        command_prefix=None,  # No prefix since we're using slash commands
+        command_prefix=commands.when_mentioned,  # slash commands only; prefix never matches
         intents=intents,
         help_command=None,  # Disable traditional help since we're using slash commands
     )
