@@ -15,7 +15,7 @@ _session.headers.update({
 })
 
 # Pre-compiled patterns for extracting data without a full HTML parse.
-_JSON_SCRIPT_RE = re.compile(r'<script type="application/json">(.*?)</script>', re.DOTALL)
+_JSON_SCRIPT_RE = re.compile(r'<script[^>]+type="application/json"[^>]*>(.*?)</script>', re.DOTALL)
 _OG_TITLE_RE = re.compile(r'<meta[^>]+property="og:title"[^>]+content="([^"]+)"')
 
 # In-memory cache for line combinations: slug -> (result, expires_at).
