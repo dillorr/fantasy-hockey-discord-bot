@@ -55,10 +55,8 @@ def format_release_announcement(release: Dict[str, Any]) -> str:
     url = release.get("html_url", "")
 
     header = f"**🚀 {name}**\n"
-    footer = f"\n-# {url}"
 
-    max_body = 2000 - len(header) - len(footer)
-    if len(body) > max_body:
-        body = body[:max_body - 1] + "…"
+    if len(header) + len(body) > 2000:
+        body = body[:2000 - len(header) - 1] + "…"
 
-    return header + (body + "\n" if body else "") + footer
+    return header + (body if body else "")
